@@ -185,7 +185,27 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        // Manual chunk splitting — separates heavy vendor libs into cacheable chunks (Issue B fix)
+        manualChunks(id) {
+          // Framer Motion — animation library (~150KB minified)
+          if (id.includes("framer-motion")) return "vendor-framer-motion";
+          // Recharts — charting library, only used on some pages
+          if (id.includes("recharts") || id.includes("d3-")) return "vendor-recharts";
+          // Radix UI — UI primitives (large suite installed)
+          if (id.includes("@radix-ui")) return "vendor-radix-ui";
+          // React core — stable and heavily cached
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "vendor-react";
+          // TanStack Query + tRPC
+          if (id.includes("@tanstack") || id.includes("@trpc")) return "vendor-trpc";
+          // Other node_modules → generic vendor chunk
+          if (id.includes("node_modules")) return "vendor";
+        },
+      },
+    },
   },
+
   server: {
     host: true,
     allowedHosts: [

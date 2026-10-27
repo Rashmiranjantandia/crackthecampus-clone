@@ -187,25 +187,29 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        // Manual chunk splitting — separates heavy vendor libs into cacheable chunks (Issue B fix)
+        // Safe vendor splitting: React and all React-context-dependent packages
+        // (Radix UI, Framer Motion) share a single 'vendor-react' chunk so that
+        // React.createContext() is always available when those packages initialize.
+        // Splitting Radix UI into a separate chunk from React caused a load-order
+        // race that crashed the app with 'Cannot read properties of undefined
+        // (reading createContext)' in production builds.
         manualChunks(id) {
-          // Framer Motion — animation library (~150KB minified)
-          if (id.includes("framer-motion")) return "vendor-framer-motion";
-          // Recharts — charting library, only used on some pages
-          if (id.includes("recharts") || id.includes("d3-")) return "vendor-recharts";
-          // Radix UI — UI primitives (large suite installed)
-          if (id.includes("@radix-ui")) return "vendor-radix-ui";
-          // React core — stable and heavily cached
-          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) return "vendor-react";
-          // TanStack Query + tRPC
-          if (id.includes("@tanstack") || id.includes("@trpc")) return "vendor-trpc";
-          // Other node_modules → generic vendor chunk
+          // React + all packages that call React.createContext() at init time
+          if (
+            id.includes("node_modules/react/") ||
+            id.includes("node_modules/react-dom/") ||
+            id.includes("node_modules/react-is/") ||
+            id.includes("@radix-ui") ||
+            id.includes("framer-motion") ||
+            id.includes("@tanstack") ||
+            id.includes("@trpc")
+          ) return "vendor-react";
+          // Everything else in node_modules -> generic vendor chunk
           if (id.includes("node_modules")) return "vendor";
         },
       },
     },
   },
-
   server: {
     host: true,
     allowedHosts: [
@@ -223,3 +227,4 @@ export default defineConfig({
     },
   },
 });
+

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ArrowUpRight, Check, Search, SlidersHorizontal } from "lucide-react";
 import SiteFooter from "../components/SiteFooter";
 
@@ -26,6 +26,14 @@ export default function Explore() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
   const filteredAssessments = useMemo(() => assessments.filter(([title, type]) => !query || `${title} ${type}`.toLowerCase().includes(query.toLowerCase())), [query]);
+  // Scroll to contest section after lazy chunk mounts when URL hash is #sec-contests
+  useEffect(() => {
+    if (window.location.hash === "#sec-contests") {
+      const el = document.getElementById("sec-contests");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
   return <div className="explore-site">
     <div className="announcement"><span>Summer coupon — Get your discount now.</span><a href="/#pricing">Claim on pricing <ArrowUpRight size={12} /></a></div>
     <header className="explore-header"><div className="explore-header-inner"><ExploreBrand /><nav><a href="/institution">Institution</a><a className="active" href="/explore">Explore</a><a href="/pricing">Pricing</a><a href="/contest">Contest</a><a href="/download">Download</a></nav><div className="explore-actions"><a href="/signup">Signup</a><a href="#contact">Contact</a><a className="explore-login" href="/login">Login</a></div></div></header>
@@ -45,3 +53,4 @@ export default function Explore() {
     <SiteFooter />
   </div>;
 }
+

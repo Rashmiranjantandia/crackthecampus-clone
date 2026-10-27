@@ -341,7 +341,7 @@ function buildCronUser(
   return {
     id: -1,
     openId: userInfo.openId,
-    name: userInfo.name || "Manus Scheduled Task",
+    name: userInfo.name || "CTC Scheduled Task",
     email: null,
     loginMethod: null,
     role: "user",
@@ -354,3 +354,4 @@ function buildCronUser(
 }
 
 export const sdk = new SDKServer();
+

@@ -16,7 +16,7 @@ const navItems = [
   { label: "Institution", href: "/institution" },
   { label: "Explore", href: "/explore" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Contest", href: "/contest" },
+  { label: "Contest", href: "/explore#sec-contests" },
   { label: "Download", href: "/download" },
 ];
 

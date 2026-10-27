@@ -185,30 +185,6 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        // Safe vendor splitting: React and all React-context-dependent packages
-        // (Radix UI, Framer Motion) share a single 'vendor-react' chunk so that
-        // React.createContext() is always available when those packages initialize.
-        // Splitting Radix UI into a separate chunk from React caused a load-order
-        // race that crashed the app with 'Cannot read properties of undefined
-        // (reading createContext)' in production builds.
-        manualChunks(id) {
-          // React + all packages that call React.createContext() at init time
-          if (
-            id.includes("node_modules/react/") ||
-            id.includes("node_modules/react-dom/") ||
-            id.includes("node_modules/react-is/") ||
-            id.includes("@radix-ui") ||
-            id.includes("framer-motion") ||
-            id.includes("@tanstack") ||
-            id.includes("@trpc")
-          ) return "vendor-react";
-          // Everything else in node_modules -> generic vendor chunk
-          if (id.includes("node_modules")) return "vendor";
-        },
-      },
-    },
   },
   server: {
     host: true,
